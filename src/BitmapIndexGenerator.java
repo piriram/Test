@@ -1,77 +1,57 @@
-import java.sql.*;
-import java.util.*;
-// TODO : 비트맵 인덱스를 텍스트 파일로 저장하도록 변경하기
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Map;
+
 public class BitmapIndexGenerator {
+    private static final String[] categories = new String[]{"음식점", "카페", "공공기관", "의료기관", "문화시설"};
+    private Map<String, BitSet> bitmapIndexes = new HashMap<>();
+    private int rowCount = 0;
 
-    private Map<String, Map<Object, BitSet>> bitmapIndexCache = new HashMap<>();
-    public Map<String, Map<Object, BitSet>> getBitmapIndexCache() {
-        return bitmapIndexCache;
-    }
-
-    public void generateBitmapIndexes() throws SQLException {
+    public void generateBitmapIndexes() throws SQLException, IOException {
         try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM places")) {
 
-            int rowCount = 0;
-
             while (resultSet.next()) {
-                String restroom = resultSet.getString("화장실_보유여부");
-                String parking = resultSet.getString("주차장_보유여부");
+                updateBitmapIndex(resultSet.getString("화장실_보유여부").equals("1") ? 1 : 0, "화장실_보유여부", rowCount);
+                updateBitmapIndex(resultSet.getString("주차장_보유여부").equals("1") ? 1 : 0, "주차장_보유여부", rowCount);
+
                 String category = resultSet.getString("카테고리");
-
-                updateBitmapIndex("restroom", restroom, rowCount);
-                updateBitmapIndex("parking", parking, rowCount);
-                updateBitmapIndex("category", category, rowCount);
-
+                for (String c : categories) {
+                    updateBitmapIndex(category.equals(c) ? 1 : 0, "카테고리_" + c, rowCount);
+                }
                 rowCount++;
             }
-        }
-    }
 
-    public void queryByBitmapIndex() throws SQLException {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Enter restroom availability (Y/N):");
-            String restroom = scanner.nextLine();
-            System.out.println("Enter parking availability (Y/N):");
-            String parking = scanner.nextLine();
-            System.out.println("Enter category:");
-            String category = scanner.nextLine();
-
-            BitSet restroomBitSet = bitmapIndexCache.get("restroom").get(restroom);
-            BitSet parkingBitSet = bitmapIndexCache.get("parking").get(parking);
-            BitSet categoryBitSet = bitmapIndexCache.get("category").get(category);
-
-            BitSet resultBitSet = (BitSet) restroomBitSet.clone();
-            resultBitSet.and(parkingBitSet);
-            resultBitSet.and(categoryBitSet);
-
-            try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
-                 Statement statement = connection.createStatement()) {
-
-                for (int i = resultBitSet.nextSetBit(0); i >= 0; i = resultBitSet.nextSetBit(i+1)) {
-                    ResultSet resultSet = statement.executeQuery("SELECT * FROM places WHERE id=" + (i + 1));
-                    while (resultSet.next()) {
-                        System.out.println(resultSet.getString("장소명"));
-                        // Print other fields if necessary
-                    }
-                }
+            // Save bitmap indexes to txt files
+            for (Map.Entry<String, BitSet> bitmapIndexEntry : bitmapIndexes.entrySet()) {
+                Files.write(Paths.get(bitmapIndexEntry.getKey() + ".txt"), bitSetToString(bitmapIndexEntry.getValue()).getBytes());
             }
         }
     }
-    private void updateBitmapIndex(String field, Object value, int row) {
-        Map<Object, BitSet> fieldIndex = bitmapIndexCache.computeIfAbsent(field, k -> new HashMap<>());
-        BitSet bitSet = fieldIndex.computeIfAbsent(value, k -> new BitSet());
-        bitSet.set(row);
+
+    private void updateBitmapIndex(int value, String field, int row) {
+        BitSet bitSet = bitmapIndexes.computeIfAbsent(field, k -> new BitSet());
+        bitSet.set(row, value == 1);
     }
 
-    public static void main(String[] args) {
-        BitmapIndexGenerator generator = new BitmapIndexGenerator();
-        try {
-            generator.generateBitmapIndexes();
-            System.out.println("Bitmap indexes generated successfully!");
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private String bitSetToString(BitSet bitSet) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < rowCount; i++) {
+            builder.append(bitSet.get(i) ? '1' : '0');
         }
+        return builder.toString();
+    }
+
+    public static void main(String[] args) throws SQLException, IOException {
+        new BitmapIndexGenerator().generateBitmapIndexes();
     }
 }
