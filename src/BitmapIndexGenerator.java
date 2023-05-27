@@ -16,6 +16,7 @@ public class BitmapIndexGenerator {
     private int rowCount = 0;
 
     public void generateBitmapIndexes() throws SQLException, IOException {
+        System.out.println("화장실_보유여부,주차장_보유여부,카테고리에 대해서 비트맵 인덱스를 생성하겠습니다.");
         try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM places")) {
@@ -36,6 +37,7 @@ public class BitmapIndexGenerator {
                 Files.write(Paths.get(bitmapIndexEntry.getKey() + ".txt"), bitSetToString(bitmapIndexEntry.getValue()).getBytes());
             }
         }
+
     }
 
     private void updateBitmapIndex(int value, String field, int row) {
@@ -51,7 +53,12 @@ public class BitmapIndexGenerator {
         return builder.toString();
     }
 
-    public static void main(String[] args) throws SQLException, IOException {
-        new BitmapIndexGenerator().generateBitmapIndexes();
+    public static void main(String[] args) {
+        BitmapIndexGenerator generator = new BitmapIndexGenerator();
+        try {
+            generator.generateBitmapIndexes();
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
     }
 }

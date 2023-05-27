@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-public class BitmapIndexAndSearcher {
+public class BitmapIndexOperationSearcher {
     private String restroomFile = "화장실_보유여부.txt";
     private String parkingFile = "주차장_보유여부.txt";
 
@@ -36,15 +36,30 @@ public class BitmapIndexAndSearcher {
         return recordIds;
     }
 
-    public void searchRecords() throws SQLException, IOException {
-        BitSet restroomBitSet = loadBitMapIndex(restroomFile,'1');
-        BitSet parkingBitSet = loadBitMapIndex(parkingFile,'1');
-        BitSet andBitSet = (BitSet) restroomBitSet.clone();
-        andBitSet.and(parkingBitSet);
+    public void searchRecords(String op,String file1,String bool1,String file2,String bool2) throws SQLException, IOException {
+        BitSet bitset1 = Config.ConditionalBitset(file1, bool1);
+        BitSet bitset2 = Config.ConditionalBitset(file2, bool2);
 
-        List<Integer> recordIds = findRecordIds(andBitSet);
+
+
+        BitSet resultBitSet = (BitSet) bitset2.clone();
+        if("and".equals(op)||"And".equals(op)||"AND".equals(op)){
+            
+            resultBitSet.and(bitset1);
+        } else if ("or".equals(op)||"OR".equals(op)||"Or".equals(op)) {
+
+            resultBitSet.or(bitset1);
+
+        }else{
+            System.out.println("목록에 없는 연산자입니다.");
+        }
+
+
+        List<Integer> recordIds = findRecordIds(resultBitSet);
         requireQuery(recordIds);
     }
+
+
 
     private static void requireQuery(List<Integer> recordIds) throws SQLException {
         int count = 0;
@@ -69,12 +84,5 @@ public class BitmapIndexAndSearcher {
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            BitmapIndexAndSearcher searcher = new BitmapIndexAndSearcher();
-            searcher.searchRecords();
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 }

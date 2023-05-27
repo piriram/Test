@@ -22,7 +22,7 @@ public class CreateTable {
 
     public static void main(String[] args) {
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        try (Connection conn = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement stmt = conn.createStatement()) {
 
             stmt.executeUpdate(CREATE_TABLE_SQL);

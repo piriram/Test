@@ -6,9 +6,7 @@ import java.util.Random;
 
 public class BatchInsert {
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/"+Config.DBNAME+"?serverTimezone=UTC";
-    private static final String USER = "root";
-    private static final String PASS = "1234";
+
     private static final String INSERT_SQL = "INSERT INTO places (장소명, 카테고리, 화장실_보유여부, 주차장_보유여부, 개설연도, 평점) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String[] categories = {"음식점", "카페", "공공기관", "의료기관", "문화시설"};
     private static final Random random = new Random();

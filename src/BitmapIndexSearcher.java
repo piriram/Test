@@ -25,18 +25,10 @@ public class BitmapIndexSearcher {
             System.out.println("입력값이 true 또는 false가 아닙니다.");
         }
 
-//        String COLLUM_NAME = "주차장_보유여부";
-        String BITMAP_INDEX_FILE = COLLUM_NAME+".txt";
-        // Load bitmap index from file
-        String bitmapData = new String(Files.readAllBytes(Paths.get(BITMAP_INDEX_FILE)));
-        BitSet bitmapIndex = new BitSet();
-        for (int i = 0; i < bitmapData.length(); i++) {
-            if (bitmapData.charAt(i) == number) {
-                bitmapIndex.set(i);
-            }
-        }
+        BitSet bitmapIndex = Config.getOneBitSet(COLLUM_NAME, number);
 
         List<Integer> recordIds = findRecordIds(bitmapIndex);
+        System.out.println(recordIds);
         int count=0;
         try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement statement = connection.createStatement()) {
@@ -58,17 +50,12 @@ public class BitmapIndexSearcher {
             System.out.println("조회된 레코드 개수: " + count);
         }
     }
+
+
+
     public void searchCategoryRecords(String CATEGORY_NAME) throws SQLException, IOException {
-        String COLLUM_NAME = "카테고리_"+CATEGORY_NAME;
-        String BITMAP_INDEX_FILE = COLLUM_NAME+".txt";
-        // Load bitmap index from file
-        String bitmapData = new String(Files.readAllBytes(Paths.get(BITMAP_INDEX_FILE)));
-        BitSet bitmapIndex = new BitSet();
-        for (int i = 0; i < bitmapData.length(); i++) {
-            if (bitmapData.charAt(i) == '1') {
-                bitmapIndex.set(i);
-            }
-        }
+        BitSet bitmapIndex = Config.getCategoryBitSet(CATEGORY_NAME);
+
 
         List<Integer> recordIds = findRecordIds(bitmapIndex);
         int count=0;
@@ -92,6 +79,8 @@ public class BitmapIndexSearcher {
             System.out.println("조회된 레코드 개수: " + count);
         }
     }
+
+
 
     private List<Integer> findRecordIds(BitSet bitmapIndex) {
         List<Integer> recordIds = new ArrayList<>();
