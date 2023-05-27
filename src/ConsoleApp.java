@@ -23,7 +23,7 @@ public class ConsoleApp {
 
             switch (choice) {
                 case 1:
-                    BatchInsert.createAndInsertRecords(100000);
+                    BatchInsert.createAndInsertRecords(1000000);
                     System.out.println("레코드 생성이 완료되었습니다.");
                     break;
                 case 2:

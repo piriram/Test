@@ -12,8 +12,7 @@ import java.util.BitSet;
 import java.util.List;
 
 public class BitmapIndexOperationSearcher {
-    private String restroomFile = "화장실_보유여부.txt";
-    private String parkingFile = "주차장_보유여부.txt";
+
 
     private BitSet loadBitMapIndex(String file,char number) throws IOException {
         String bitmapData = new String(Files.readAllBytes(Paths.get(file)));
@@ -56,33 +55,7 @@ public class BitmapIndexOperationSearcher {
 
 
         List<Integer> recordIds = findRecordIds(resultBitSet);
-        requireQuery(recordIds);
+        Config.BitsetPrint(recordIds);
     }
-
-
-
-    private static void requireQuery(List<Integer> recordIds) throws SQLException {
-        int count = 0;
-        try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
-             Statement statement = connection.createStatement()) {
-
-            System.out.println("ID    장소명    카테고리    화장실_보유여부    주차장_보유여부    개설연도    평점");
-            // Retrieve records with matching IDs
-            for (int recordId : recordIds) {
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM places WHERE ID = " + recordId);
-                if (resultSet.next()) {
-                    double 평점 = resultSet.getDouble("평점");
-                    DecimalFormat 평점Format = new DecimalFormat("0.#");
-                    System.out.println(resultSet.getInt("ID") + "    " + resultSet.getString("장소명") + "    " + resultSet.getString("카테고리")
-                            + "    " + resultSet.getBoolean("화장실_보유여부") + "    " + resultSet.getBoolean("주차장_보유여부")
-                            + "    " + resultSet.getInt("개설연도") + "    " + 평점Format.format(평점));
-
-                    count++;
-                }
-            }
-            System.out.println("조회된 레코드 개수: " + count);
-        }
-    }
-
 
 }
