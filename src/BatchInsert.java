@@ -19,7 +19,7 @@ public class BatchInsert {
 
     public static void createAndInsertRecords(int recordCount) {
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        try (Connection conn = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(INSERT_SQL)) {
 
             conn.setAutoCommit(false);  // Disable auto-commit

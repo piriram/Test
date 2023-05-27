@@ -11,7 +11,7 @@ public class DeleteAllData {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, Config.USERNAME, Config.PASSWORD);
+            Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
             System.out.println("MySQL 데이터베이스에 연결되었습니다!");
 
             String deleteQuery = "DELETE FROM " + tableName;
