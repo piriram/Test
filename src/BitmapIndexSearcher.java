@@ -16,9 +16,15 @@ public class BitmapIndexSearcher {
 
 
     public void searchOneRecords(String COLLUM_NAME,String bool) throws SQLException, IOException {
-        char number;
-        if (bool == "true") number = '1';
-        else number = '0';
+        char number = '3';
+        if (bool.equals("true")) {
+            number = '1';
+        } else if (bool.equals("false")) {
+            number = '0';
+        } else {
+            System.out.println("입력값이 true 또는 false가 아닙니다.");
+        }
+
 //        String COLLUM_NAME = "주차장_보유여부";
         String BITMAP_INDEX_FILE = COLLUM_NAME+".txt";
         // Load bitmap index from file

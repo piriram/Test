@@ -1,185 +1,196 @@
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.*;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class ConsoleApp {
-    private static final String[] categories = new String[]{"음식점", "카페", "공공기관", "의료기관", "문화시설"};
-    private static final String[] files = {"주차장_보유여부.txt", "카테고리_공공기관.txt", "카테고리_문화시설.txt",
-            "카테고리_음식점.txt", "카테고리_의료기관.txt", "카테고리_카페.txt", "화장실_보유여부.txt"};
-
-    private Map<String, BitSet> bitmapIndexes = new HashMap<>();
-    private int rowCount = 0;
-
-    public void loadIndexes() throws IOException {
-        for (String file : files) {
-            String data = new String(Files.readAllBytes(Paths.get(file)));
-            BitSet bitSet = new BitSet();
-            for (int i = 0; i < data.length(); i++) {
-                if (data.charAt(i) == '1') bitSet.set(i);
-            }
-            bitmapIndexes.put(file.replace(".txt", ""), bitSet);
-            rowCount = Math.max(rowCount, bitSet.length());
-        }
-    }
-
-    public void createAndInsertRecords(int count) throws SQLException {
-        BatchInsert.createAndInsertRecords(count);
-    }
-
-    public void executeBitmapIndexQuery() throws SQLException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("주차장 보유여부 입력(1/0): ");
-        boolean parking = Boolean.parseBoolean(scanner.nextLine());
-        System.out.println("화장실 보유여부 입력(1/0): ");
-        boolean restroom = Boolean.parseBoolean(scanner.nextLine());
-        System.out.println("카테고리 입력(음식점/카페/공공기관/의료기관/문화시설): ");
-        String category = "카테고리_" + scanner.nextLine();
-
-        BitSet parkingBitSet = bitmapIndexes.get(parking ? "주차장_보유여부" : "");
-        BitSet restroomBitSet = bitmapIndexes.get(restroom ? "화장실_보유여부" : "");
-        BitSet categoryBitSet = bitmapIndexes.get(category);
-
-        try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM places")) {
-
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-
-            int index = 0;
-            while (resultSet.next() && index < rowCount) {
-                if ((parkingBitSet == null || parkingBitSet.get(index)) &&
-                        (restroomBitSet == null || restroomBitSet.get(index)) &&
-                        (categoryBitSet == null || categoryBitSet.get(index))) {
-                    StringBuilder recordBuilder = new StringBuilder("Record: ");
-                    for (int i = 1; i <= columnCount; i++) {
-                        recordBuilder.append(metaData.getColumnLabel(i)).append(": ").append(resultSet.getString(i)).append(", ");
-                    }
-                    String record = recordBuilder.toString();
-                    System.out.println(record.substring(0, record.length() - 2));
-                }
-                index++;
-            }
-        }
-    }
-
-    public void executeRangeQuery() throws SQLException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("시작 범위 입력: ");
-        int startRange = Integer.parseInt(scanner.nextLine());
-        System.out.println("종료 범위 입력: ");
-        int endRange = Integer.parseInt(scanner.nextLine());
-
-        try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM places WHERE ID BETWEEN " + startRange + " AND " + endRange)) {
-
-            while (resultSet.next()) {
-                System.out.println(resultSet.getInt("ID") + "    " + resultSet.getString("장소명") + "    " +
-                        resultSet.getString("카테고리") + "    " + resultSet.getBoolean("화장실_보유여부") + "    " +
-                        resultSet.getBoolean("주차장_보유여부") + "    " + resultSet.getInt("개설연도") + "    " +
-                        String.format("%.1f", resultSet.getDouble("평점")));
-            }
-        }
-    }
-
-    public void executeValueSearch() throws SQLException {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("검색할 값 입력: ");
-        String searchValue = scanner.nextLine();
-
-        try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM places WHERE 장소명 LIKE '%" + searchValue + "%'")) {
-
-            while (resultSet.next()) {
-                System.out.println(resultSet.getInt("ID") + "    " + resultSet.getString("장소명") + "    " +
-                        resultSet.getString("카테고리") + "    " + resultSet.getBoolean("화장실_보유여부") + "    " +
-                        resultSet.getBoolean("주차장_보유여부") + "    " + resultSet.getInt("개설연도") + "    " +
-                        String.format("%.1f", resultSet.getDouble("평점")));
-            }
-        }
-    }
-
-    public void deleteAllRecords() throws SQLException {
-        try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate("DELETE FROM places");
-        }
-    }
+    private static final String URL = "jdbc:mysql://localhost:3306/database_name";
+    private static final String USERNAME = "your_username";
+    private static final String PASSWORD = "your_password";
 
     public static void main(String[] args) {
-        ConsoleApp consoleApp = new ConsoleApp();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("===== Console App =====");
-        System.out.println("1. 레코드 생성");
-        System.out.println("2. 비트맵 인덱스 질의");
-        System.out.println("3. 범위 질의");
-        System.out.println("4. 값 찾기");
-        System.out.println("5. 레코드 모두 삭제");
-        System.out.println("0. 종료");
+        while (true) {
+            System.out.println("========= 콘솔 창 =========");
+            System.out.println("1. 레코드 생성");
+            System.out.println("2. 비트맵 인덱스 질의");
+            System.out.println("3. 범위 질의 (개설연도, 평점)");
+            System.out.println("4. 값 찾기");
+            System.out.println("5. 레코드 모두 삭제");
+            System.out.println("0. 종료");
+            System.out.print("메뉴를 선택하세요: ");
 
-        boolean exit = false;
-
-        while (!exit) {
-            System.out.println("원하는 작업을 선택하세요 (0-5): ");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
 
             switch (choice) {
                 case 1:
-                    try {
-                        System.out.println("레코드 생성 중...");
-                        consoleApp.createAndInsertRecords(100000);
-                        System.out.println("레코드 생성이 완료되었습니다.");
-                    } catch (SQLException e) {
-                        System.out.println("레코드 생성 중 오류가 발생했습니다: " + e.getMessage());
-                    }
+                    BatchInsert.createAndInsertRecords(100000);
+                    System.out.println("레코드 생성이 완료되었습니다.");
                     break;
                 case 2:
-                    try {
-                        consoleApp.executeBitmapIndexQuery();
-                    } catch (SQLException e) {
-                        System.out.println("비트맵 인덱스 질의 중 오류가 발생했습니다: " + e.getMessage());
-                    }
+
+                    performBitmapIndexQuery(scanner);
                     break;
                 case 3:
-                    try {
-                        consoleApp.executeRangeQuery();
-                    } catch (SQLException e) {
-                        System.out.println("범위 질의 중 오류가 발생했습니다: " + e.getMessage());
-                    }
+                    performRangeQuery(scanner);
                     break;
                 case 4:
-                    try {
-                        consoleApp.executeValueSearch();
-                    } catch (SQLException e) {
-                        System.out.println("값 찾기 중 오류가 발생했습니다: " + e.getMessage());
-                    }
+                    performValueSearch(scanner);
                     break;
                 case 5:
-                    try {
-                        System.out.println("모든 레코드를 삭제합니다...");
-                        consoleApp.deleteAllRecords();
-                        System.out.println("모든 레코드 삭제가 완료되었습니다.");
-                    } catch (SQLException e) {
-                        System.out.println("레코드 삭제 중 오류가 발생했습니다: " + e.getMessage());
-                    }
+                    DeleteAllData.deleteAllData();
+                    System.out.println("모든 레코드가 삭제되었습니다.");
                     break;
                 case 0:
-                    exit = true;
-                    break;
+                    System.out.println("프로그램을 종료합니다.");
+                    System.exit(0);
                 default:
-                    System.out.println("유효하지 않은 선택입니다. 다시 선택해주세요.");
-                    break;
+                    System.out.println("잘못된 메뉴 선택입니다. 다시 선택해주세요.");
             }
         }
+    }
 
-        System.out.println("프로그램을 종료합니다. 감사합니다!");
+    private static void performBitmapIndexQuery(Scanner scanner) {
+        System.out.println("========= 비트맵 인덱스 질의를 위한 컬럼개수 선택 =========");
+        System.out.println("1. 컬럼개수 1개");
+        System.out.println("2. 컬럼개수 2개");
+        System.out.print("선택하세요: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+
+        switch (choice) {
+            case 1:
+                System.out.println("========= 검색할 컬럼을 선택해주세요 =========");
+                System.out.println("1. 주차장_보유여부");
+                System.out.println("2. 화장실_보유여부");
+                System.out.println("3. 카테고리");
+                int bitChoice = scanner.nextInt();
+                scanner.nextLine();
+                switch (bitChoice){
+                    case 1:
+                        System.out.print("true or false를 입력해주세요. ");
+                        System.out.println();
+                        String boolChoice1 = scanner.next();
+                        scanner.nextLine();
+
+                        try {
+                            BitmapIndexSearcher searcher = new BitmapIndexSearcher();
+                            searcher.searchOneRecords("주차장_보유여부",boolChoice1);
+                        } catch (SQLException | IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case 2:
+                        System.out.print("true or false를 입력해주세요. ");
+                        System.out.println();
+                        String boolChoice2 = scanner.next();
+                        scanner.nextLine();
+                        try {
+
+                            BitmapIndexSearcher searcher = new BitmapIndexSearcher();
+                            searcher.searchOneRecords("화장실_보유여부",boolChoice2);
+                        } catch (SQLException | IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+
+                    case 3:
+                        System.out.print("카테고리 항목을 골라주세요 (공공기관/문화시설/음식점/의료기관/카페");
+                        String cateChoice = scanner.next();
+                        scanner.nextLine();
+                        try {
+                            BitmapIndexSearcher searcher = new BitmapIndexSearcher();
+                            searcher.searchCategoryRecords(cateChoice);
+                        } catch (SQLException | IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+
+                }
+
+
+            case 2:
+                performTwoColumnBitmapQuery(scanner);
+                break;
+            default:
+                System.out.println("잘못된 선택입니다.");
+        }
+    }
+
+    private static void performTwoColumnBitmapQuery(Scanner scanner) {
+        System.out.println("========= 컬럼개수 2개 - 연산 선택 =========");
+        System.out.println("1. AND 연산");
+        System.out.println("2. OR 연산");
+        System.out.print("선택하세요: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+
+        System.out.print("컬럼명1을 입력하세요: ");
+        String column1 = scanner.nextLine();
+        System.out.print("컬럼명2를 입력하세요: ");
+        String column2 = scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                try {
+                    BitmapIndexAndSearcher searcher = new BitmapIndexAndSearcher();
+                    searcher.searchRecords();
+                } catch (SQLException | IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 2:
+                try {
+                    BitmapIndexAndSearcher searcher = new BitmapIndexAndSearcher();
+                    searcher.searchRecords();
+                } catch (SQLException | IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                System.out.println("잘못된 선택입니다.");
+        }
+    }
+
+    private static void performRangeQuery(Scanner scanner) {
+        System.out.println("========= 범위 질의 (개설연도, 평점) =========");
+        System.out.println("컬럼 1: 개설연도");
+        System.out.println("컬럼 2: 평점");
+        System.out.print("첫 번째 컬럼을 선택하세요 (1 or 2): ");
+        int column1 = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+
+        System.out.print("두 번째 컬럼을 선택하세요 (1 or 2): ");
+        int column2 = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+
+        System.out.print("첫 번째 값 입력: ");
+        double value1 = scanner.nextDouble();
+        scanner.nextLine(); // Consume the newline character
+
+        System.out.print("두 번째 값 입력: ");
+        double value2 = scanner.nextDouble();
+        scanner.nextLine(); // Consume the newline character
+
+//        try {
+//            RangeQuerySearcher.searchRecords(URL, USERNAME, PASSWORD, column1, value1, column2, value2);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    private static void performValueSearch(Scanner scanner) {
+        System.out.println("========= 값 찾기 =========");
+        System.out.print("컬럼명을 입력하세요: ");
+        String columnName = scanner.nextLine();
+        System.out.print("찾는 값 입력: ");
+        String value = scanner.nextLine();
+
+//        try {
+//            ValueSearcher.searchRecords(URL, USERNAME, PASSWORD, columnName, value);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
 }

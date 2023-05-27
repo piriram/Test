@@ -4,16 +4,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DeleteAllData {
-    public static void deleteAllData(String dbName, String tableName) {
-        String url = "jdbc:mysql://localhost:3306/" + dbName + "?serverTimezone=UTC";
-        String username = "root";
-        String password = "1234";
+    public static void deleteAllData() {
+
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
             System.out.println("MySQL 데이터베이스에 연결되었습니다!");
 
+            String tableName = "places";
             String deleteQuery = "DELETE FROM " + tableName;
             Statement statement = connection.createStatement();
 
@@ -33,6 +32,6 @@ public class DeleteAllData {
     }
 
     public static void main(String[] args) {
-        deleteAllData("TEST1", "places");
+        deleteAllData();
     }
 }
