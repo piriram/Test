@@ -2,14 +2,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 
 public class BplusTreeCreator {
-    private static final String URL = Config.URL;
-    private static final String USERNAME = Config.USERNAME;
-    private static final String PASSWORD = Config.PASSWORD;
 
-    public void createIndexes() {
-        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+    public static void createIndexes(Scanner scanner) {
+        try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement statement = connection.createStatement()) {
 
             // Create B+ tree index for ID
@@ -20,15 +18,12 @@ public class BplusTreeCreator {
             String createPlaceNameIndexQuery = "CREATE INDEX idx_placeName ON places (장소명)";
             statement.executeUpdate(createPlaceNameIndexQuery);
 
-            System.out.println("B+ 트리 인덱스 생성이 완료되었습니다.");
+            System.out.println("ID와 장소명에 대한 B+ 트리 인덱스 생성이 완료되었습니다.");
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
-        BplusTreeCreator creator = new BplusTreeCreator();
-        creator.createIndexes();
-    }
+
 }

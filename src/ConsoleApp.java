@@ -12,9 +12,10 @@ public class ConsoleApp {
             System.out.println("1. 레코드 생성");
             System.out.println("2. 비트맵 인덱스 생성");
             System.out.println("3. 비트맵 인덱스 질의");
-            System.out.println("4. 범위 질의 (개설연도, 평점)");
+            System.out.println("4. B+ Tree Index 생성");
             System.out.println("5. 값 찾기");
-            System.out.println("6. 레코드 모두 삭제");
+            System.out.println("6. 범위 질의(개설연도, 평점)");
+            System.out.println("7. 레코드 모두 삭제");
             System.out.println("0. 종료");
             System.out.print("메뉴를 선택하세요: ");
 
@@ -33,12 +34,15 @@ public class ConsoleApp {
                     performBitmapIndexQuery(scanner);
                     break;
                 case 4:
-                    performRangeQuery(scanner);
+                    BplusTreeCreator.createIndexes(scanner);
                     break;
                 case 5:
-                    performValueSearch(scanner);
+                    QueryRunner.sqlQuery(scanner);
                     break;
                 case 6:
+                    QueryRunner.rangeQuery(scanner);
+                    break;
+                case 7:
                     DeleteAllData.deleteAllData();
                     System.out.println("모든 레코드가 삭제되었습니다.");
                     break;
@@ -229,11 +233,7 @@ public class ConsoleApp {
         double value2 = scanner.nextDouble();
         scanner.nextLine(); // Consume the newline character
 
-//        try {
-//            RangeQuerySearcher.searchRecords(URL, USERNAME, PASSWORD, column1, value1, column2, value2);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+
     }
 
     private static void performValueSearch(Scanner scanner) {
