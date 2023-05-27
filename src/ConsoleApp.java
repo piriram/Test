@@ -65,6 +65,7 @@ public class ConsoleApp {
         System.out.println("========= 비트맵 인덱스 질의를 위한 컬럼개수 선택 =========");
         System.out.println("1. 컬럼개수 1개");
         System.out.println("2. 컬럼개수 2개");
+        System.out.println("3. 컬럼개수 3개");
         System.out.print("선택하세요: ");
         int choice = scanner.nextInt();
         scanner.nextLine(); // Consume the newline character
@@ -76,6 +77,8 @@ public class ConsoleApp {
             case 2:
                 performTwoColumnBitmapQuery(scanner);
                 break;
+            case 3:
+                performThreeColumn(scanner);
             default:
                 System.out.println("잘못된 선택입니다.");
         }
@@ -153,7 +156,7 @@ public class ConsoleApp {
             case 1:
                 try {
                     BitmapIndexOperationSearcher searcher = new BitmapIndexOperationSearcher();
-                    searcher.searchRecords("and",column1,bool1,column2,bool2);
+                    searcher.searchTwoRecords("and",column1,bool1,column2,bool2);
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();
                 }
@@ -161,7 +164,7 @@ public class ConsoleApp {
             case 2:
                 try {
                     BitmapIndexOperationSearcher searcher = new BitmapIndexOperationSearcher();
-                    searcher.searchRecords("and",column1,bool1,column2,bool2);
+                    searcher.searchTwoRecords("or",column1,bool1,column2,bool2);
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();
                 }
@@ -170,7 +173,42 @@ public class ConsoleApp {
                 System.out.println("잘못된 선택입니다.");
         }
     }
+    private static void performThreeColumn(Scanner scanner) {
+        System.out.println("========= 연산 선택 =========");
+        System.out.println("1. AND 연산");
+        System.out.println("2. OR 연산");
+        System.out.print("선택하세요: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
 
+        System.out.print("화장실_보유여부의 값을 입력하세요 ");
+        String bool1 = scanner.nextLine();
+        System.out.print("주차장_보유여부의 값을 입력하세요 ");
+        String bool2 = scanner.nextLine();
+        System.out.print("카테고리의 값을 입력하세요 ");
+        String bool3 = scanner.nextLine();
+
+        switch (choice) {
+            case 1:
+                try {
+                    BitmapIndexOperationSearcher searcher = new BitmapIndexOperationSearcher();
+                    searcher.searchThreeRecords("and",bool1,bool2,bool3);
+                } catch (SQLException | IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case 2:
+                try {
+                    BitmapIndexOperationSearcher searcher = new BitmapIndexOperationSearcher();
+                    searcher.searchThreeRecords("or",bool1,bool2,bool3);
+                } catch (SQLException | IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                System.out.println("잘못된 선택입니다.");
+        }
+    }
     private static void performRangeQuery(Scanner scanner) {
         System.out.println("========= 범위 질의 (개설연도, 평점) =========");
         System.out.println("컬럼 1: 개설연도");
