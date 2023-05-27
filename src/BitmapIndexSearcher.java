@@ -27,8 +27,8 @@ public class BitmapIndexSearcher {
 
         BitSet bitmapIndex = Config.getOneBitSet(COLLUM_NAME, number);
 
-        List<Integer> recordIds = findRecordIds(bitmapIndex);
-        Config.BitsetPrint(recordIds);
+
+        Config.BitsetPrint(bitmapIndex);
     }
 
 
@@ -36,23 +36,12 @@ public class BitmapIndexSearcher {
 
     public void searchCategoryRecords(String CATEGORY_NAME) throws SQLException, IOException {
         BitSet bitmapIndex = Config.getCategoryBitSet(CATEGORY_NAME);
-
-
-        List<Integer> recordIds = findRecordIds(bitmapIndex);
-        Config.BitsetPrint(recordIds);
+        Config.BitsetPrint(bitmapIndex);
     }
 
 
 
-    private List<Integer> findRecordIds(BitSet bitmapIndex) {
-        List<Integer> recordIds = new ArrayList<>();
-        for (int i = 0; i < bitmapIndex.length(); i++) {
-            if (bitmapIndex.get(i)) {
-                recordIds.add(i + 1);
-            }
-        }
-        return recordIds;
-    }
+
 
     public static void main(String[] args) {
         BitmapIndexSearcher searcher = new BitmapIndexSearcher();

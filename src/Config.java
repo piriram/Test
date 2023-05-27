@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
@@ -76,8 +77,8 @@ public class Config {
         }
         return bitset1;
     }
-    static void BitsetPrint(List<Integer> recordIds) throws SQLException {
-        int count=0;
+    static void BitsetPrint(BitSet bitmapIndex) throws SQLException {
+        List<Integer> recordIds = findRecordIds(bitmapIndex);
         try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement statement = connection.createStatement()) {
 
@@ -92,11 +93,18 @@ public class Config {
                             + "    " + resultSet.getBoolean("화장실_보유여부") + "    " + resultSet.getBoolean("주차장_보유여부")
                             + "    " + resultSet.getInt("개설연도") + "    " + 평점Format.format(평점));
 
-                    count++;
                 }
             }
-            System.out.println("조회된 레코드 개수: " + count);
         }
+    }
+    static List<Integer> findRecordIds(BitSet bitmapIndex) {
+        List<Integer> recordIds = new ArrayList<>();
+        for (int i = 0; i < bitmapIndex.length(); i++) {
+            if (bitmapIndex.get(i)) {
+                recordIds.add(i + 1);
+            }
+        }
+        return recordIds;
     }
 
 }

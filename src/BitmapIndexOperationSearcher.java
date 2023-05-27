@@ -52,10 +52,7 @@ public class BitmapIndexOperationSearcher {
         }else{
             System.out.println("목록에 없는 연산자입니다.");
         }
-
-
-        List<Integer> recordIds = findRecordIds(resultBitSet);
-        Config.BitsetPrint(recordIds);
+        Config.BitsetPrint(resultBitSet);
     }
 
 }
