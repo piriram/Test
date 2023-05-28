@@ -13,8 +13,6 @@ import java.text.DecimalFormat;
 
 public class BitmapIndexSearcher {
 
-
-
     public void searchOneRecords(String COLLUM_NAME,String bool) throws SQLException, IOException {
         char number = '3';
         if (bool.equals("true")) {
@@ -31,17 +29,10 @@ public class BitmapIndexSearcher {
         Config.BitsetPrint(bitmapIndex);
     }
 
-
-
-
     public void searchCategoryRecords(String CATEGORY_NAME) throws SQLException, IOException {
         BitSet bitmapIndex = Config.getCategoryBitSet(CATEGORY_NAME);
         Config.BitsetPrint(bitmapIndex);
     }
-
-
-
-
 
     public static void main(String[] args) {
         BitmapIndexSearcher searcher = new BitmapIndexSearcher();

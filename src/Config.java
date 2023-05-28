@@ -81,9 +81,7 @@ public class Config {
         List<Integer> recordIds = findRecordIds(bitmapIndex);
         try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement statement = connection.createStatement()) {
-//            int count = 0;
-
-            System.out.println("ID    장소명    카테고리    화장실_보유여부    주차장_보유여부    개설연도    평점");
+             System.out.println("ID    장소명    카테고리    화장실_보유여부    주차장_보유여부    개설연도    평점");
             // Retrieve records with matching IDs
             for (int recordId : recordIds) {
                 ResultSet resultSet = statement.executeQuery("SELECT * FROM places WHERE ID = " + recordId);
@@ -93,11 +91,8 @@ public class Config {
                     System.out.println(resultSet.getInt("ID") + "    " + resultSet.getString("장소명") + "    " + resultSet.getString("카테고리")
                             + "    " + resultSet.getBoolean("화장실_보유여부") + "    " + resultSet.getBoolean("주차장_보유여부")
                             + "    " + resultSet.getInt("개설연도") + "    " + 평점Format.format(평점));
-//                    count++;
-
                 }
             }
-//            System.out.println("조회된 레코드 개수: " + count);
             System.out.println("조회된 레코드 개수: " + bitmapIndex.cardinality());
         }
     }
