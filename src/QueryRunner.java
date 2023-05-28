@@ -103,6 +103,7 @@ public class QueryRunner {
                     System.out.println("종료 연도를 입력하세요: ");
                     int endYear = scanner.nextInt();
                     String query1 = "SELECT * FROM places WHERE 개설연도 >= " + startYear + " AND 개설연도 <= " + endYear;
+                    String countQuery1 = "SELECT COUNT(*) FROM places WHERE 개설연도 >= " + startYear + " AND 개설연도 <= " + endYear;
                     ResultSet resultSet1 = statement.executeQuery(query1);
                     System.out.println("ID    장소명    카테고리    화장실_보유여부    주차장_보유여부    개설연도    평점");
                     while (resultSet1.next()) {
@@ -112,6 +113,14 @@ public class QueryRunner {
                                 + "    " + resultSet1.getBoolean("화장실_보유여부") + "    " + resultSet1.getBoolean("주차장_보유여부")
                                 + "    " + resultSet1.getInt("개설연도") + "    " + 평점Format.format(평점));
                     }
+                    if (countQuery1 != null) {
+                        resultSet1 = statement.executeQuery(countQuery1);
+
+                        if (resultSet1.next()) {
+                            int count = resultSet1.getInt(1);
+                            System.out.println("조회된 레코드 개수: " + count);
+                        }
+                    }
                     break;
                 case 2:
                     System.out.println("최소 평점을 입력하세요: ");
@@ -119,6 +128,7 @@ public class QueryRunner {
                     System.out.println("최대 평점을 입력하세요: ");
                     double maxRating = scanner.nextDouble();
                     String query2 = "SELECT * FROM places WHERE 평점 >= " + minRating + " AND 평점 <= " + maxRating;
+                    String countQuery2 = "SELECT COUNT(*) FROM places WHERE 평점 >= " + minRating + " AND 평점 <= " + maxRating;
                     ResultSet resultSet2 = statement.executeQuery(query2);
                     System.out.println("ID    장소명    카테고리    화장실_보유여부    주차장_보유여부    개설연도    평점");
                     while (resultSet2.next()) {
@@ -127,6 +137,14 @@ public class QueryRunner {
                         System.out.println(resultSet2.getInt("ID") + "    " + resultSet2.getString("장소명") + "    " + resultSet2.getString("카테고리")
                                 + "    " + resultSet2.getBoolean("화장실_보유여부") + "    " + resultSet2.getBoolean("주차장_보유여부")
                                 + "    " + resultSet2.getInt("개설연도") + "    " + 평점Format.format(평점));
+                    }
+                    if (countQuery2 != null) {
+                        resultSet2 = statement.executeQuery(countQuery2);
+
+                        if (resultSet2.next()) {
+                            int count = resultSet2.getInt(1);
+                            System.out.println("조회된 레코드 개수: " + count);
+                        }
                     }
                     break;
             }

@@ -4,11 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class CreateTable {
-
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/"+Config.DBNAME;
-    private static final String USER = "root";
-    private static final String PASS = "1234";
-    private static final String CREATE_TABLE_SQL =
+ private static final String CREATE_TABLE_SQL =
             "CREATE TABLE places (" +
                     "ID INT PRIMARY KEY AUTO_INCREMENT, " +
                     "장소명 VARCHAR(50), " +
