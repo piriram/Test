@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DBSPROJECT:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DBSPROJECT_jar</output-path>
+    <root id="archive" name="DBSPROJECT.jar">
+      <element id="module-output" name="DBSPROJECT" />
+      <element id="extracted-dir" path="$USER_HOME$/mysql-connector-j-8.0.33/mysql-connector-j-8.0.33.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

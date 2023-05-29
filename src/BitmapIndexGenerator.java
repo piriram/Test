@@ -1,6 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -34,11 +34,11 @@ public class BitmapIndexGenerator {
 
             // Save bitmap indexes to txt files
             for (Map.Entry<String, BitSet> bitmapIndexEntry : bitmapIndexes.entrySet()) {
-                Files.write(Paths.get(bitmapIndexEntry.getKey() + ".txt"), bitSetToString(bitmapIndexEntry.getValue()).getBytes());
+                saveBitmapIndexToFile(bitmapIndexEntry.getKey() + ".txt", bitmapIndexEntry.getValue());
             }
         }
 
-//        Thread.sleep(38 * 60 * 1000); // 대기 시간: 38분
+        Thread.sleep(1 * 30 * 1000); // 대기 시간: 30초
     }
 
     private void updateBitmapIndex(int value, String field, int row) {
@@ -46,12 +46,13 @@ public class BitmapIndexGenerator {
         bitSet.set(row, value == 1);
     }
 
-    private String bitSetToString(BitSet bitSet) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < rowCount; i++) {
-            builder.append(bitSet.get(i) ? '1' : '0');
+    private void saveBitmapIndexToFile(String fileName, BitSet bitSet) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (int i = 0; i < rowCount; i++) {
+                char value = bitSet.get(i) ? '1' : '0';
+                writer.write(value);
+            }
         }
-        return builder.toString();
     }
 
     public static void main(String[] args) {

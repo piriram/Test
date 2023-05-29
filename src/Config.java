@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Config {
     public static String USERNAME = "root";
-    public static String PASSWORD = "0000";
+    public static String PASSWORD = "1234";
     public static String DBNAME = "DBSPROJECT";
     public static String TABLE_NAME = "places";
     public static String URL = "jdbc:mysql://localhost:3306/"+Config.DBNAME;
@@ -78,7 +78,7 @@ public class Config {
              System.out.println("ID    장소명    카테고리    화장실_보유여부    주차장_보유여부    개설연도    평점");
             // Retrieve records with matching IDs
             for (int recordId : recordIds) {
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM places WHERE ID = " + recordId);
+                ResultSet resultSet = statement.executeQuery("SELECT * FROM "+TABLE_NAME+" WHERE ID = " + recordId);
                 if (resultSet.next()) {
                     double 평점 = resultSet.getDouble("평점");
                     DecimalFormat 평점Format = new DecimalFormat("0.#");

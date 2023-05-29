@@ -10,8 +10,8 @@ public class BatchInsert {
     private static final Random random = new Random();
 
     public static void main(String[] args) {
-        createAndInsertRecords(100000);
-    }//10만개 데이터 생성
+        createAndInsertRecords(1000000);
+    }//100만개 데이터 생성
 
     public static void createAndInsertRecords(int recordCount) {
 
