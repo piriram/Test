@@ -11,7 +11,7 @@ public class BplusTreeCreator {
              Statement statement = connection.createStatement()) {
 
             // Create B+ tree index for ID
-            String createIdIndexQuery = "CREATE INDEX idx_id ON places (ID)";
+            String createIdIndexQuery = "CREATE INDEX idx_id ON "+Config.TABLE_NAME+" (ID)";
             statement.executeUpdate(createIdIndexQuery);
 
             // Create B+ tree index for placeName

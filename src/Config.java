@@ -6,30 +6,24 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Scanner;
 
 public class Config {
-    public static final String USERNAME = "root";
-    public static final String PASSWORD = "1234";
-    public static final String DBNAME = "DBSPROJECT";
-    public static final String URL = "jdbc:mysql://localhost:3306/"+Config.DBNAME;
+    public static String USERNAME = "root";
+    public static String PASSWORD = "0000";
+    public static String DBNAME = "DBSPROJECT";
+    public static String TABLE_NAME = "places";
+    public static String URL = "jdbc:mysql://localhost:3306/"+Config.DBNAME;
     // 다른 전역 변수들도 이곳에 추가
-    public static String determineType(String input) {
-        try {
-            Integer.parseInt(input);
-            return "Integer";
-        } catch (NumberFormatException e) {
-            // input is not an Integer
-        }
+    public static void setConnectionInfo() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("사용자 이름을 입력하세요: ");
+        USERNAME = scanner.nextLine();
+        System.out.print("비밀번호를 입력하세요: ");
+        PASSWORD = scanner.nextLine();
 
-        try {
-            Double.parseDouble(input);
-            return "Double";
-        } catch (NumberFormatException e) {
-            // input is not a Double
-        }
-
-        return "String";
     }
+
     static BitSet getCategoryBitSet(String CATEGORY_NAME) throws IOException {
         String COLLUM_NAME = "카테고리_"+ CATEGORY_NAME;
         String BITMAP_INDEX_FILE = COLLUM_NAME+".txt";

@@ -12,7 +12,7 @@ public class DeleteAllData {
             Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
             System.out.println("MySQL 데이터베이스에 연결되었습니다!");
 
-            String tableName = "places";
+            String tableName = Config.TABLE_NAME;
             String deleteQuery = "DELETE FROM " + tableName;
             Statement statement = connection.createStatement();
 

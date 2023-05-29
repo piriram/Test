@@ -15,11 +15,11 @@ public class BitmapIndexGenerator {
     private Map<String, BitSet> bitmapIndexes = new HashMap<>();
     private int rowCount = 0;
 
-    public void generateBitmapIndexes() throws SQLException, IOException {
+    public void generateBitmapIndexes() throws SQLException, IOException, InterruptedException {
         System.out.println("화장실_보유여부,주차장_보유여부,카테고리에 대해서 비트맵 인덱스를 생성하겠습니다.");
         try (Connection connection = DriverManager.getConnection(Config.URL, Config.USERNAME, Config.PASSWORD);
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM places")) {
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM "+Config.TABLE_NAME)) {
 
             while (resultSet.next()) {
                 updateBitmapIndex(resultSet.getString("화장실_보유여부").equals("1") ? 1 : 0, "화장실_보유여부", rowCount);
@@ -38,6 +38,7 @@ public class BitmapIndexGenerator {
             }
         }
 
+//        Thread.sleep(38 * 60 * 1000); // 대기 시간: 38분
     }
 
     private void updateBitmapIndex(int value, String field, int row) {
@@ -57,7 +58,7 @@ public class BitmapIndexGenerator {
         BitmapIndexGenerator generator = new BitmapIndexGenerator();
         try {
             generator.generateBitmapIndexes();
-        } catch (SQLException | IOException e) {
+        } catch (SQLException | IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

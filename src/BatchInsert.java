@@ -5,13 +5,13 @@ import java.sql.SQLException;
 import java.util.Random;
 
 public class BatchInsert {
-    private static final String INSERT_SQL = "INSERT INTO places (장소명, 카테고리, 화장실_보유여부, 주차장_보유여부, 개설연도, 평점) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_SQL = "INSERT INTO "+Config.TABLE_NAME+" (장소명, 카테고리, 화장실_보유여부, 주차장_보유여부, 개설연도, 평점) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String[] categories = {"음식점", "카페", "공공기관", "의료기관", "문화시설"};
     private static final Random random = new Random();
 
     public static void main(String[] args) {
-        createAndInsertRecords(1000000);
-    }//100만개 데이터 생성
+        createAndInsertRecords(100000);
+    }//10만개 데이터 생성
 
     public static void createAndInsertRecords(int recordCount) {
 

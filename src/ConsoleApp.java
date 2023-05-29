@@ -6,16 +6,17 @@ public class ConsoleApp {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
+        Config.setConnectionInfo();
         while (true) {
             System.out.println("========= 콘솔 창 =========");
-            System.out.println("1. 레코드 생성");
-            System.out.println("2. 비트맵 인덱스 생성");
-            System.out.println("3. 비트맵 인덱스 질의");
-            System.out.println("4. B+ Tree Index 생성");
-            System.out.println("5. 값 찾기");
-            System.out.println("6. 범위 질의(개설연도, 평점)");
-            System.out.println("7. 레코드 모두 삭제");
+            System.out.println("1. 테이블 생성");
+            System.out.println("2. 레코드 생성");
+            System.out.println("3. 비트맵 인덱스 생성");
+            System.out.println("4. 비트맵 인덱스 질의");
+            System.out.println("5. B+ Tree Index 생성");
+            System.out.println("6. 값 찾기");
+            System.out.println("7. 범위 질의(개설연도, 평점)");
+            System.out.println("8. 레코드 모두 삭제");
             System.out.println("0. 종료");
             System.out.print("메뉴를 선택하세요: ");
 
@@ -23,29 +24,41 @@ public class ConsoleApp {
             scanner.nextLine(); // Consume the newline character
 
             switch (choice) {
-                case 1:
+                case 2:
                     BatchInsert.createAndInsertRecords(1000000);
                     System.out.println("레코드 생성이 완료되었습니다.");
                     break;
-                case 2:
+                case 3:
                     generateBitmapIndexes();
                     break;
-                case 3:
+                case 4:
                     performBitmapIndexQuery(scanner);
                     break;
-                case 4:
+                case 5:
                     BplusTreeCreator.createIndexes(scanner);
                     break;
-                case 5:
+                case 6:
                     QueryRunner.sqlQuery(scanner);
                     break;
-                case 6:
+                case 7:
                     QueryRunner.rangeQuery(scanner);
                     break;
-                case 7:
+                case 8:
                     DeleteAllData.deleteAllData();
                     System.out.println("모든 레코드가 삭제되었습니다.");
                     break;
+                case 1:
+
+                    System.out.println("DB 조작을 위한 준비 마쳤습니다.");
+                    System.out.print("데이터베이스 이름을 입력하세요: ");
+                    Config.DBNAME = scanner.nextLine();
+                    Config.URL = "jdbc:mysql://localhost:3306/" + Config.DBNAME;
+                    System.out.print("테이블 이름을 입력하세요: ");
+                    Config.TABLE_NAME = scanner.nextLine();
+                    System.out.println("테이블을 생성하겠습니다.");
+                    CreateTable.createTable();
+                    break;
+
                 case 0:
                     System.out.println("프로그램을 종료합니다.");
                     System.exit(0);
@@ -62,8 +75,12 @@ public class ConsoleApp {
             System.out.println("비트맵 인덱스 생성이 완료되었습니다.");
         } catch (SQLException | IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Thread interrupted");
         }
     }
+
 
     private static void performBitmapIndexQuery(Scanner scanner) {
         System.out.println("========= 비트맵 인덱스 질의를 위한 컬럼개수 선택 =========");
